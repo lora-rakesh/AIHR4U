@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn project.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: HR4U
+          property: connectionString
+databases:
+  - name: HR4U
+    plan: free
+
