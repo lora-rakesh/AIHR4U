@@ -137,8 +137,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-
-CORS_ALLOW_ALL_ORIGINS = True  # change in production
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
