@@ -27,11 +27,9 @@ This is the backend API for **AIHR4U**, built with Django and Django REST Framew
 ##  Local Development Setup
 
 ### 1. Clone the repository
-
-```bash
-git init
-git clone https://github.com/lora-rakesh/AIHR4U.git
-
+    git init
+    git clone https://github.com/lora-rakesh/AIHR4U.git
+    
 ## Installation and Setup Instructions
 
 1. **Create Project Directory**
