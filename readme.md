@@ -26,14 +26,15 @@ This is the backend API for **AIHR4U**, built with Django and Django REST Framew
 
 ##  Local Development Setup
 
-### 1. Clone the repository
+  **Clone the repository**
+     ```bash
     git init
     git clone https://github.com/lora-rakesh/AIHR4U.git
     
 ## Installation and Setup Instructions
 
 1. **Create Project Directory**
-   
+   ```bash
    mkdir HR4U
    cd HR4U
 
@@ -117,7 +118,7 @@ This is the backend API for **AIHR4U**, built with Django and Django REST Framew
    └── README.md                     # Project documentation
 
 
-🔒 CSRF Protection
+## CSRF Protection
 This project uses session authentication and CSRF protection.
 
 To get CSRF token:
@@ -127,10 +128,10 @@ POST requests should include the X-CSRFToken header with the token from the csrf
 
 
 
-✅ Company Verification API
+## Company Verification API
 
 
-POST /api/verify-company/
+**POST /api/verify-company/**
 Request JSON:
 
 json
