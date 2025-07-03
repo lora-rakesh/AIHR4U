@@ -33,7 +33,7 @@ This is the backend API for **AIHR4U**, built with Django and Django REST Framew
 ## Installation and Setup Instructions
 
 1. **Create Project Directory**
-   ```bash
+   
    mkdir HR4U
    cd HR4U
 
