@@ -136,6 +136,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+AUTH_USER_MODEL = 'app.Employee'
 
 
 CORS_ALLOW_ALL_ORIGINS = True  # change in production

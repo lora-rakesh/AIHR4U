@@ -39,3 +39,29 @@ class CompanyVerifyAPIView(GenericAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# views.py
+from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import LoginSerializer
+from .models import Employee  # your custom model
+
+class EmployeeLoginAPIView(GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            employee_id = serializer.validated_data['employee_id']
+            password = serializer.validated_data['password']
+            user = authenticate(request, username=employee_id, password=password)
+            if user and isinstance(user, Employee):
+                return Response({
+                    'message': 'Login successful',
+                    'employee_id': user.employee_id,
+                    'name': user.name,
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

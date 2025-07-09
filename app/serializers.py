@@ -8,3 +8,9 @@ class CompanyVerifySerializer(serializers.Serializer):
         if not Company.objects.filter(name__iexact=value.strip()).exists():
             raise serializers.ValidationError("❌ Company not found")
         return value
+# serializers.py
+from rest_framework import serializers
+
+class LoginSerializer(serializers.Serializer):
+    employee_id = serializers.CharField()
+    password = serializers.CharField(write_only=True)
