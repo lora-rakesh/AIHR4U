@@ -1,13 +1,18 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+# --- Company Model ---
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.name
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db import models
 
+# --- Custom Upload Path ---
+def profile_upload_path(instance, filename):
+    return f"profile_pics/{instance.employee_id}/{filename}"
+
+# --- Custom User Manager ---
 class EmployeeManager(BaseUserManager):
     def create_user(self, employee_id, password=None, **extra_fields):
         if not employee_id:
@@ -30,9 +35,12 @@ class EmployeeManager(BaseUserManager):
 
         return self.create_user(employee_id, password, **extra_fields)
 
+# --- Custom Employee Model ---
 class Employee(AbstractBaseUser, PermissionsMixin):
     employee_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
+    profile_picture = models.ImageField(upload_to=profile_upload_path, blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # required for admin access
 

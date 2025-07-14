@@ -67,3 +67,4 @@ class EmployeeAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 admin.site.register(Employee, EmployeeAdmin)
+
