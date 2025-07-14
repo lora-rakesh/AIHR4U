@@ -4,7 +4,6 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login
 
-from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -16,12 +15,12 @@ from .serializers import (
     ProfilePhotoSerializer
 )
 
-# CSRF Token Setup
+# --- CSRF Token View ---
 @ensure_csrf_cookie
 def get_csrf_token(request):
     return JsonResponse({"message": "✅ CSRF cookie set"})
 
-# Company Verification View
+# --- Company Verification View ---
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class CompanyVerifyAPIView(GenericAPIView):
     serializer_class = CompanyVerifySerializer
@@ -41,7 +40,7 @@ class CompanyVerifyAPIView(GenericAPIView):
             return Response({"message": "❌ Company Not Found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Employee Login View
+# --- Employee Login View ---
 class EmployeeLoginAPIView(GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -52,7 +51,7 @@ class EmployeeLoginAPIView(GenericAPIView):
             password = serializer.validated_data['password']
             user = authenticate(request, username=employee_id, password=password)
             if user and isinstance(user, Employee):
-                login(request, user)  # Session login
+                login(request, user)  # Set session
                 return Response({
                     'message': '✅ Login successful',
                     'employee_id': user.employee_id,
@@ -61,7 +60,7 @@ class EmployeeLoginAPIView(GenericAPIView):
             return Response({'error': '❌ Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Profile Photo Create View
+# --- Profile Photo Create View ---
 class CreateProfilePhotoAPIView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfilePhotoSerializer
@@ -71,10 +70,16 @@ class CreateProfilePhotoAPIView(GenericAPIView):
         serializer = self.get_serializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': '✅ Profile photo uploaded successfully.'}, status=status.HTTP_201_CREATED)
+            file_url = request.build_absolute_uri(employee.profile_picture.url)
+            file_name = employee.profile_picture.name.split('/')[-1]
+            return Response({
+                'message': '✅ Profile photo uploaded successfully.',
+                'url': file_url,
+                'filename': file_name,
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Profile Photo Update View
+# --- Profile Photo Update View ---
 class UpdateProfilePhotoAPIView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfilePhotoSerializer
@@ -84,10 +89,16 @@ class UpdateProfilePhotoAPIView(GenericAPIView):
         serializer = self.get_serializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': '✅ Profile photo updated successfully.'}, status=status.HTTP_200_OK)
+            file_url = request.build_absolute_uri(employee.profile_picture.url)
+            file_name = employee.profile_picture.name.split('/')[-1]
+            return Response({
+                'message': '✅ Profile photo updated successfully.',
+                'url': file_url,
+                'filename': file_name,
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Profile Photo Delete View
+# --- Profile Photo Delete View ---
 class DeleteProfilePhotoAPIView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfilePhotoSerializer
@@ -95,6 +106,10 @@ class DeleteProfilePhotoAPIView(GenericAPIView):
     def delete(self, request):
         employee = get_object_or_404(Employee, employee_id=request.user.employee_id)
         if employee.profile_picture:
+            filename = employee.profile_picture.name.split('/')[-1]
             employee.profile_picture.delete(save=True)
-            return Response({'message': '🗑️ Profile photo deleted successfully.'}, status=status.HTTP_200_OK)
+            return Response({
+                'message': '🗑️ Profile photo deleted successfully.',
+                'filename': filename
+            }, status=status.HTTP_200_OK)
         return Response({'error': '⚠️ No profile photo to delete.'}, status=status.HTTP_400_BAD_REQUEST)
