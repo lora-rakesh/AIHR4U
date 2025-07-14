@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Company, Employee
 
-# --- Company Verification Serializer ---
+# Company Verification Serializer
 class CompanyVerifySerializer(serializers.Serializer):
     company_name = serializers.CharField()
 
@@ -10,13 +10,14 @@ class CompanyVerifySerializer(serializers.Serializer):
             raise serializers.ValidationError("❌ Company not found")
         return value
 
-# --- Login Serializer ---
+# Login Serializer
 class LoginSerializer(serializers.Serializer):
     employee_id = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
-# --- Profile Picture Serializer ---
+# Profile Picture Serializer
 class ProfilePhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['profile_picture']
+    
