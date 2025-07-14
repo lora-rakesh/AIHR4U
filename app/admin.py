@@ -1,16 +1,16 @@
 from django.contrib import admin
-from .models import Company
+from django import forms
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
+from .models import Company, Employee
+
+# --- Company Admin ---
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ('name',)
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Employee
-from django import forms
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-# Form to add new employees
+# --- Employee Creation Form ---
 class EmployeeCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
@@ -33,38 +33,41 @@ class EmployeeCreationForm(forms.ModelForm):
             user.save()
         return user
 
-# Form to update employee
+# --- Employee Update Form ---
 class EmployeeChangeForm(forms.ModelForm):
-    password = ReadOnlyPasswordHashField()
+    password = ReadOnlyPasswordHashField(label="Password", help_text="Raw passwords are not stored, so there is no way to see this user’s password.")
 
     class Meta:
         model = Employee
-        fields = ('employee_id', 'name', 'password', 'is_active')
+        fields = ('employee_id', 'name', 'password', 'is_active', 'is_staff', 'profile_picture')
 
     def clean_password(self):
         return self.initial["password"]
 
-# Custom admin
+# --- Employee Admin ---
 class EmployeeAdmin(BaseUserAdmin):
     form = EmployeeChangeForm
     add_form = EmployeeCreationForm
 
-    list_display = ('employee_id', 'name', 'is_active')
-    list_filter = ('is_active',)
+    list_display = ('employee_id', 'name', 'is_active', 'is_staff')
+    list_filter = ('is_active', 'is_staff')
+
     fieldsets = (
         (None, {'fields': ('employee_id', 'password')}),
-        ('Personal Info', {'fields': ('name',)}),
-        ('Permissions', {'fields': ('is_active',)}),
+        ('Personal Info', {'fields': ('name', 'profile_picture')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
     )
+
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('employee_id', 'name', 'password1', 'password2', 'is_active')}
+            'fields': ('employee_id', 'name', 'password1', 'password2', 'is_active', 'is_staff')}
         ),
     )
+
     search_fields = ('employee_id', 'name')
     ordering = ('employee_id',)
-    filter_horizontal = ()
+    filter_horizontal = ('groups', 'user_permissions')
 
+# --- Register Employee ---
 admin.site.register(Employee, EmployeeAdmin)
-
